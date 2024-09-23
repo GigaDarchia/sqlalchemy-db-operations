@@ -90,13 +90,17 @@ def fetch_books_with_most_pages(session: Session):
         .scalar()
     )
     results = (
-        session.query(Book)
+        session.query(Book, Author)
+        .join(AuthorBook, Book.book_id == AuthorBook.book_id)
+        .join(Author, Author.author_id == AuthorBook.author_id)
         .filter(Book.pages == max_pages)
         .all()
     )
     print("Books with most pages: ")
-    for r in results:
-        print(f"{r.title} - {r.pages} pages")
+    for book, author in results:
+        print(f"Book ID: {book.book_id} | Book title: {book.title} | Category: {book.category} | "
+              f"Pages: {book.pages} | Release Date: {book.release_date} | "
+              f"Author's ID: {author.author_id} | Author's name: {author.first_name} {author.last_name}")
 
 # Fetch average number of pages of every book in the database
 def fetch_average_page_number(session: Session):
